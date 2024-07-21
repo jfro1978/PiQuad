@@ -2,6 +2,7 @@
 #include <unistd.h> // Needed for closing the I2C connection
 #include <wiringPi.h>
 #include <wiringPiI2C.h>
+#include "imu.h"
 
 // Define the I2C address of the IMU
 constexpr uint8_t IMU_address = 0b1101000;
