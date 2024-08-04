@@ -65,11 +65,15 @@
     </RemotePostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="esc.cpp" />
     <ClCompile Include="imu.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="pid.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="esc.h" />
     <ClInclude Include="imu.h" />
+    <ClInclude Include="pid.h" />
   </ItemGroup>
   <ItemDefinitionGroup />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
