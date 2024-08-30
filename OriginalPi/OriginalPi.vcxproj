@@ -67,12 +67,14 @@
   <ItemGroup>
     <ClCompile Include="esc.cpp" />
     <ClCompile Include="imu.cpp" />
+    <ClCompile Include="loop.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="pid.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="esc.h" />
     <ClInclude Include="imu.h" />
+    <ClInclude Include="loop.h" />
     <ClInclude Include="pid.h" />
   </ItemGroup>
   <ItemDefinitionGroup />
