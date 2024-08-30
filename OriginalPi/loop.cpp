@@ -2,12 +2,29 @@
 
 void Loop::run()
 {
+	intertialMeasurementUnit mpu6050(gyroConfigEnum::FS_250_DPS, accelConfigEnum::AFS_2_G);
+
+	mpu6050.initialiseIMU();
+
 	while (1)
 	{
-		/*
-		1) Read gyro
+		// 1) Read gyro
+		mpu6050.readIMU_Data(mRawIMU_GyroPitchData, mRawIMU_GyroRollData, mRawIMU_GyroYawData,
+			mRawIMU_AccelX_Data, mRawIMU_AccelY_Data, mRawIMU_AccelZ_Data);
 
-		2) Filter the gyro data using 50/50 filter, i.e. previous (filtered) value contributes 80% to current value, current (raw) value contributes 20% to current (filtered) value
+		// 2) Filter the IMU data to limit the effect of spikes in the received IMU data
+		mGyroPitch = (mGyroPitch * IMU_DATA_FILTER) + (mRawIMU_GyroPitchData * IMU_DATA_FILTER);
+		mGyroRoll = (mGyroRoll * IMU_DATA_FILTER) + (mRawIMU_GyroRollData * IMU_DATA_FILTER);
+		mGyroYaw = (mGyroYaw * IMU_DATA_FILTER) + (mRawIMU_GyroYawData * IMU_DATA_FILTER);
+
+		mAccelX = (mAccelX * IMU_DATA_FILTER) + (mRawIMU_AccelX_Data * IMU_DATA_FILTER);
+		mAccelY = (mAccelY * IMU_DATA_FILTER) + (mRawIMU_AccelY_Data * IMU_DATA_FILTER);
+		mAccelZ = (mAccelZ * IMU_DATA_FILTER) + (mRawIMU_AccelZ_Data * IMU_DATA_FILTER);
+
+		/*
+		
+
+		
 
 		3) Check conditions for getting quad ready for flight, i.e. changing state of quadStateEnum variable
 			if(receiver_channel_3 < 1050 && receiver_channel_4 < 1050)
