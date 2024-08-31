@@ -5,9 +5,19 @@
 
 static const float IMU_DATA_FILTER = 0.5;
 
+enum class quadStateEnum
+{
+	NOT_STARTED,
+	PREPARING_FOR_FLIGHT,
+	READY_FOR_FLIGHT
+};
+
 class Loop 
 {
 public:
+	Loop();
+	~Loop() = default;
+
 	void run();
 
 private:
@@ -26,6 +36,13 @@ private:
 	short mAccelX;
 	short mAccelY;
 	short mAccelZ;
+
+	quadStateEnum mQuadState;
+
+	unsigned int mReceiverChannel1;
+	unsigned int mReceiverChannel2;
+	unsigned int mReceiverChannel3;
+	unsigned int mReceiverChannel4;
 };
 
 #endif // _LOOP_CLASS

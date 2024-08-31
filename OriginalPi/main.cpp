@@ -2,13 +2,6 @@
 #include <wiringPi.h>
 #include "loop.h"
 
-enum class quadStateEnum 
-{
-	NOT_STARTED,
-	PREPARING_FOR_FLIGHT,
-	READY_FOR_FLIGHT
-};
-
 int main() {
 	try
 	{

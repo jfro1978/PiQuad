@@ -1,5 +1,23 @@
 #include "loop.h"
 
+Loop::Loop() :
+	mRawIMU_GyroPitchData(0),
+	mRawIMU_GyroRollData(0),
+	mRawIMU_GyroYawData(0),
+	mRawIMU_AccelX_Data(0),
+	mRawIMU_AccelY_Data(0),
+	mRawIMU_AccelZ_Data(0),
+	mAccelX(0),
+	mAccelY(0),
+	mAccelZ(0),
+	mQuadState(quadStateEnum::NOT_STARTED),
+	mReceiverChannel1(1000),
+	mReceiverChannel2(1000),
+	mReceiverChannel3(1000),
+	mReceiverChannel4(1000)
+{
+}
+
 void Loop::run()
 {
 	intertialMeasurementUnit mpu6050(gyroConfigEnum::FS_250_DPS, accelConfigEnum::AFS_2_G);
@@ -21,16 +39,15 @@ void Loop::run()
 		mAccelY = (mAccelY * IMU_DATA_FILTER) + (mRawIMU_AccelY_Data * IMU_DATA_FILTER);
 		mAccelZ = (mAccelZ * IMU_DATA_FILTER) + (mRawIMU_AccelZ_Data * IMU_DATA_FILTER);
 
+		// 3) Check conditions for getting quad ready for flight, i.e.changing state of quadStateEnum variable
+		if (mReceiverChannel3 < 1050 && mReceiverChannel4 < 1050)
+		{
+			mQuadState = quadStateEnum::PREPARING_FOR_FLIGHT;
+		}
+
 		/*
-		
 
-		
 
-		3) Check conditions for getting quad ready for flight, i.e. changing state of quadStateEnum variable
-			if(receiver_channel_3 < 1050 && receiver_channel_4 < 1050)
-			  {
-				start = 1;
-			  }
 
 		4) Check conditions for moving to READY_FOR_FLIGHT. This is simply to check if in PREPARING_FOR_FLIGHT, if so reset previous PID error values, then set state to READY_FOR_FLIGHT
 					pid_i_roll_output_prev = 0;
