@@ -14,4 +14,8 @@ pidController::pidController(float pGainPitch, float pGainRoll, float pGainYaw,
 	mD_GainYaw(dGainYaw)
 {
 }
+
+void pidController::resetPreviousErrorValues()
+{
+}
  
