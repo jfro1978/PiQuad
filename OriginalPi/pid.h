@@ -29,12 +29,12 @@ private:
 	float mD_GainYaw;
 
 	// Controller loop error values
-	float mPID_I_Roll_Output_Previous = 0.0f;
-	float mPID_Error_Roll_Previous = 0.0f;
-	float mPID_I_Pitch_Output_Previous = 0.0f;
-	float mPID_Error_Pitch_Previous = 0.0f;
-	float mPID_I_Yaw_Output_Previous = 0.0f;
-	float mPID_Error_Yaw_Previous = 0.0f;
+	float mPID_I_Roll_Output_Previous;
+	float mPID_Error_Roll_Previous;
+	float mPID_I_Pitch_Output_Previous;
+	float mPID_Error_Pitch_Previous;
+	float mPID_I_Yaw_Output_Previous;
+	float mPID_Error_Yaw_Previous;
 };
 
 #endif // _PID_CLASS

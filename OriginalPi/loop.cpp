@@ -20,9 +20,15 @@ Loop::Loop() :
 
 void Loop::run()
 {
+	// Create IMU object
 	intertialMeasurementUnit mpu6050(gyroConfigEnum::FS_250_DPS, accelConfigEnum::AFS_2_G);
 
-	mpu6050.initialiseIMU();
+	mpu6050.initialiseIMU(); // TODO: This should be called from the constructor
+
+	// Create PID controller object
+	pidController pid(PID_P_PITCH_GAIN, PID_P_ROLL_GAIN, PID_P_YAW_GAIN,
+					  PID_I_PITCH_GAIN, PID_I_ROLL_GAIN, PID_I_YAW_GAIN,
+					  PID_D_PITCH_GAIN, PID_D_ROLL_GAIN, PID_D_YAW_GAIN);
 
 	while (1)
 	{
@@ -51,20 +57,11 @@ void Loop::run()
 			(mReceiverChannel3 < 1050) &&
 			(mReceiverChannel4 > 1450))
 		{
-
+			pid.resetPreviousErrorValues();
 			mQuadState = quadStateEnum::READY_FOR_FLIGHT;
 		}
 
 		/*
-		4) Check conditions for moving to READY_FOR_FLIGHT. This is simply to check if in PREPARING_FOR_FLIGHT, if so reset previous PID error values, then set state to READY_FOR_FLIGHT
-					pid_i_roll_output_prev = 0;
-					pid_error_roll_prev = 0;
-					pid_i_pitch_output_prev = 0;
-					pid_error_pitch_prev = 0;
-					pid_i_yaw_output_prev = 0;
-					pid_error_yaw_prev = 0;
-
-
 		5) Check conditions for stopping flight, i.e. to move back to NOT_STARTED
 				if(start == 2 && receiver_channel_3 < 1050 && receiver_channel_4 > 1950)
 				  {
