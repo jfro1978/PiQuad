@@ -13,17 +13,28 @@ public:
 	void resetPreviousErrorValues();
 
 private:
+	// Proportional gain values
 	float mP_GainPitch;
 	float mP_GainRoll;
 	float mP_GainYaw;
 
+	// Integral gain values
 	float mI_GainPitch;
 	float mI_GainRoll;
 	float mI_GainYaw;
 
+	// Derivative gain values
 	float mD_GainPitch;
 	float mD_GainRoll;
 	float mD_GainYaw;
+
+	// Controller loop error values
+	float mPID_I_Roll_Output_Previous = 0.0f;
+	float mPID_Error_Roll_Previous = 0.0f;
+	float mPID_I_Pitch_Output_Previous = 0.0f;
+	float mPID_Error_Pitch_Previous = 0.0f;
+	float mPID_I_Yaw_Output_Previous = 0.0f;
+	float mPID_Error_Yaw_Previous = 0.0f;
 };
 
 #endif // _PID_CLASS
