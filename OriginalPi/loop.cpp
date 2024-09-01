@@ -45,10 +45,17 @@ void Loop::run()
 			mQuadState = quadStateEnum::PREPARING_FOR_FLIGHT;
 		}
 
+		/* 4) Check if state has just transitioned from PREPARING_FOR_FLIGHT to READY_FOR_FLIGHT.
+			  If so, reset historical PID error values. */
+		if ((mQuadState == quadStateEnum::PREPARING_FOR_FLIGHT) &&
+			(mReceiverChannel3 < 1050) &&
+			(mReceiverChannel4 > 1450))
+		{
+
+			mQuadState = quadStateEnum::READY_FOR_FLIGHT;
+		}
+
 		/*
-
-
-
 		4) Check conditions for moving to READY_FOR_FLIGHT. This is simply to check if in PREPARING_FOR_FLIGHT, if so reset previous PID error values, then set state to READY_FOR_FLIGHT
 					pid_i_roll_output_prev = 0;
 					pid_error_roll_prev = 0;
