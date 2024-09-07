@@ -30,57 +30,65 @@ static constexpr uint8_t GYRO_YOUT_L_REGISTER_ADDRESS = 0x46;
 static constexpr uint8_t GYRO_ZOUT_H_REGISTER_ADDRESS = 0x47;
 static constexpr uint8_t GYRO_ZOUT_L_REGISTER_ADDRESS = 0x48;
 
-enum class gyroConfigEnum
+namespace Quad
 {
-	GYRO_FS_NOT_SET,
-	FS_250_DPS,
-	FS_500_DPS,
-	FS_1000_DPS,
-	FS_2000_DPS
-};
+	namespace IMU
+	{
 
-enum class accelConfigEnum
-{
-	AFS_NOT_SET,
-	AFS_2_G,
-	AFS_4_G,
-	AFS_8_G,
-	AFS_16_G,
-};
+		enum class gyroConfigEnum
+		{
+			GYRO_FS_NOT_SET,
+			FS_250_DPS,
+			FS_500_DPS,
+			FS_1000_DPS,
+			FS_2000_DPS
+		};
 
-class intertialMeasurementUnit {
-public:
-	intertialMeasurementUnit::intertialMeasurementUnit(const gyroConfigEnum& gyroFS, const accelConfigEnum& accelFS);
-	intertialMeasurementUnit::~intertialMeasurementUnit();
+		enum class accelConfigEnum
+		{
+			AFS_NOT_SET,
+			AFS_2_G,
+			AFS_4_G,
+			AFS_8_G,
+			AFS_16_G,
+		};
 
-	void initialiseIMU();
+		class intertialMeasurementUnit {
+		public:
+			intertialMeasurementUnit::intertialMeasurementUnit(const gyroConfigEnum& gyroFS, const accelConfigEnum& accelFS);
+			intertialMeasurementUnit::~intertialMeasurementUnit();
 
-	void readIMU_Data(short& gyroPitch, short& gyroRoll, short& gyroYaw,
-		short& accelX, short& accelY, short& accelZ);
+			void initialiseIMU();
 
-private:
-	void calibrateIMU();
+			void readIMU_Data(short& gyroPitch, short& gyroRoll, short& gyroYaw,
+				short& accelX, short& accelY, short& accelZ);
 
-	void setIMU_MaxRates(const gyroConfigEnum& gyroCfg, const accelConfigEnum& accelCfg);
+		private:
+			void calibrateIMU();
 
-	int imuHandle;
+			void setIMU_MaxRates(const gyroConfigEnum& gyroCfg, const accelConfigEnum& accelCfg);
 
-	float GYRO_LSB_VALUE; // See p29/46 of register map document
-	float ACCEL_LSB_VALUE; // See p31/46 of register map document
+			int imuHandle;
 
-	gyroConfigEnum gyroFullScale = gyroConfigEnum::GYRO_FS_NOT_SET;
-	accelConfigEnum accelFullScale = accelConfigEnum::AFS_NOT_SET;
+			float GYRO_LSB_VALUE; // See p29/46 of register map document
+			float ACCEL_LSB_VALUE; // See p31/46 of register map document
 
-	float offsetGyroPitch;
-	float offsetGyroRoll;
-	float offsetGyroYaw;
-	float offsetAccelX;
-	float offsetAccelY;
-	float offsetAccelZ;
+			gyroConfigEnum gyroFullScale = gyroConfigEnum::GYRO_FS_NOT_SET;
+			accelConfigEnum accelFullScale = accelConfigEnum::AFS_NOT_SET;
 
-	// IMU data masks
-	uint8_t gyroConfigMask; // See register 27 on p14/46 of register map document
-	uint8_t accelConfigMask; // See register 28 on p15/46 of register map document
-};
+			float offsetGyroPitch;
+			float offsetGyroRoll;
+			float offsetGyroYaw;
+			float offsetAccelX;
+			float offsetAccelY;
+			float offsetAccelZ;
+
+			// IMU data masks
+			uint8_t gyroConfigMask; // See register 27 on p14/46 of register map document
+			uint8_t accelConfigMask; // See register 28 on p15/46 of register map document
+		};
+
+	} // namespace IMU
+} // namespace Quad
 
 #endif // _IMU_CLASS

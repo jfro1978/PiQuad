@@ -14,51 +14,61 @@ static const int max_roll_rate = 250; //Max roll rate
 static const float PID_P_PITCH_GAIN = 1.0f;
 static const float PID_I_PITCH_GAIN = 0.12f;
 static const float PID_D_PITCH_GAIN = 15.0f;
-int max_pitch_rate = 250; //Max pitch rate
+static const int max_pitch_rate = 250; //Max pitch rate
 
 static const float PID_P_YAW_GAIN = 3.0f;
 static const float PID_I_YAW_GAIN = 0.02f;
 static const float PID_D_YAW_GAIN = 0.0f;
-int max_yaw_rate = 250; //Max yaw rate
+static const int max_yaw_rate = 250; //Max yaw rate
 
-enum class quadStateEnum
+namespace Quad
 {
-	NOT_STARTED,
-	PREPARING_FOR_FLIGHT,
-	READY_FOR_FLIGHT
-};
+	namespace Loop
+	{
 
-class Loop 
-{
-public:
-	Loop();
-	~Loop() = default;
+		enum class quadStateEnum
+		{
+			STANDBY,
+			PREPARING_FOR_FLIGHT,
+			READY_FOR_FLIGHT
+		};
 
-	void run();
+		class Loop
+		{
+		public:
+			Loop();
+			~Loop() = default;
 
-private:
-	short mRawIMU_GyroPitchData;
-	short mRawIMU_GyroRollData;
-	short mRawIMU_GyroYawData;
+			void run();
 
-	short mRawIMU_AccelX_Data;
-	short mRawIMU_AccelY_Data;
-	short mRawIMU_AccelZ_Data;
+		private:
+			short mRawIMU_GyroPitchData;
+			short mRawIMU_GyroRollData;
+			short mRawIMU_GyroYawData;
 
-	short mGyroPitch;
-	short mGyroRoll;
-	short mGyroYaw;
+			short mRawIMU_AccelX_Data;
+			short mRawIMU_AccelY_Data;
+			short mRawIMU_AccelZ_Data;
 
-	short mAccelX;
-	short mAccelY;
-	short mAccelZ;
+			short mGyroPitch;
+			short mGyroRoll;
+			short mGyroYaw;
 
-	quadStateEnum mQuadState;
+			short mAccelX;
+			short mAccelY;
+			short mAccelZ;
 
-	unsigned int mReceiverChannel1;
-	unsigned int mReceiverChannel2;
-	unsigned int mReceiverChannel3;
-	unsigned int mReceiverChannel4;
-};
+			quadStateEnum mQuadState;
+
+			unsigned int mReceiverChannel1;
+			unsigned int mReceiverChannel2;
+			unsigned int mReceiverChannel3;
+			unsigned int mReceiverChannel4;
+
+			std::chrono::system_clock::time_point mLoopTimer;
+		};
+
+} // namespace Loop
+} // namespace Quad
 
 #endif // _LOOP_CLASS

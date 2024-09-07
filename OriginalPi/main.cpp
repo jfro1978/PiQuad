@@ -5,7 +5,7 @@
 int main() {
 	try
 	{
-		Loop loop;
+		Quad::Loop::Loop loop;
 
 		loop.run();
 	}
