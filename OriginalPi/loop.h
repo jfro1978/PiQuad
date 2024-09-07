@@ -65,7 +65,8 @@ namespace Quad
 			unsigned int mReceiverChannel3;
 			unsigned int mReceiverChannel4;
 
-			std::chrono::system_clock::time_point mLoopTimer;
+			std::chrono::system_clock::time_point mLoopStartTime;
+
 		};
 
 } // namespace Loop

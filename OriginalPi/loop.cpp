@@ -1,4 +1,6 @@
 #include "loop.h"
+#include "imu.h"
+#include "pid.h"
 #include <chrono>
 #include <thread>
 
@@ -21,7 +23,7 @@ namespace Quad
 			mReceiverChannel2(1000),
 			mReceiverChannel3(1000),
 			mReceiverChannel4(1000),
-			mLoopTimer(std::chrono::system_clock::now())
+			mLoopStartTime(std::chrono::system_clock::now())
 		{
 		}
 
@@ -30,14 +32,15 @@ namespace Quad
 			// TODO: Set LED on to indicate program is running
 
 			// Create IMU object
-			intertialMeasurementUnit mpu6050(gyroConfigEnum::FS_250_DPS, accelConfigEnum::AFS_2_G);
+			Quad::IMU::intertialMeasurementUnit mpu6050(Quad::IMU::gyroConfigEnum::FS_250_DPS, 
+				Quad::IMU::accelConfigEnum::AFS_2_G);
 
 			mpu6050.initialiseIMU(); // TODO: This should be called from the constructor
 
 			// Set LED to indicate that IMU calibration is complete
 
 			// Create PID controller object
-			pidController pid(PID_P_PITCH_GAIN, PID_P_ROLL_GAIN, PID_P_YAW_GAIN,
+			Quad::PID::pidController pid(PID_P_PITCH_GAIN, PID_P_ROLL_GAIN, PID_P_YAW_GAIN,
 				PID_I_PITCH_GAIN, PID_I_ROLL_GAIN, PID_I_YAW_GAIN,
 				PID_D_PITCH_GAIN, PID_D_ROLL_GAIN, PID_D_YAW_GAIN);
 
@@ -85,10 +88,9 @@ namespace Quad
 				// 7)
 
 				// 8) Loop until 4ms since last loop has expired
-				{
-					std::chrono::system_clock::time_point currentTime = std::chrono::system_clock::now();
-					std::chrono::system_clock::time_point timeElapsed = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - lastTime);
-				}
+				std::this_thread::sleep_until(mLoopStartTime + std::chrono::milliseconds(4));
+				mLoopStartTime = std::chrono::system_clock::now();
+				
 
 				/*
 
@@ -101,7 +103,7 @@ namespace Quad
 				else
 					7d) set all ESC values to 1000us
 
-				8) Loop until 4ms since last loop has expired
+				
 
 				9) Work out how long from now the ESCs have to be high for, i.e. get current time, then add the value from either 7c or 7d to this time.
 
