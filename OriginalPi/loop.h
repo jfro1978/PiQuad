@@ -75,6 +75,11 @@ namespace Quad
 
 			std::chrono::system_clock::time_point mLoopStartTime;
 
+			unsigned int mPWM_FrontRight;
+			unsigned int mPWM_FrontLeft;
+			unsigned int mPWM_RearRight;
+			unsigned int mPWM_RearLeft;
+
 		private:
 			// Member functions
 			void rcInterruptHandler(int gpio, int level, uint32_t tick);

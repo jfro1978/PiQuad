@@ -18,6 +18,8 @@ namespace Quad
 			void determineSetpoints(unsigned int channel1,
 				unsigned int channel2, unsigned int channel3, unsigned int channel4);
 
+			void determineAxisPID_Outputs();
+
 		private:
 			// Proportional gain values
 			float mP_GainPitch;

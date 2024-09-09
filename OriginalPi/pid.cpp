@@ -79,6 +79,19 @@ namespace Quad
 			mAltitudeSetpoint = (channel3 - MINIMUM_PID_VALUE) * ALTITUDE_SCALING_FACTOR;
 
 		}
+
+		void pidController::determineAxisPID_Outputs()
+		{
+			// Pitch - 'stubbed'
+			// Need setpoints, and current axis info, e.g. current roll rate, etc
+			float pitchError = current pitch info - mPitchSetpoint;
+
+			// Roll - 'stubbed'
+
+			// Yaw - 'stubbed'
+
+			// Altitude
+		}
 	} // namespace PID
 } // namespace Quad
  

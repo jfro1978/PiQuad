@@ -36,7 +36,8 @@ namespace Quad
 			Quad::IMU::intertialMeasurementUnit mpu6050(Quad::IMU::gyroConfigEnum::FS_250_DPS, 
 				Quad::IMU::accelConfigEnum::AFS_2_G);
 
-			mpu6050.initialiseIMU(); // TODO: This should be called from the constructor
+			mpu6050.initialiseIMU(); // TODO: This should be called from the constructor. Also can it be done from pid class?
+									 // Not sure it's needed in this loop class?
 
 			// Set LED to indicate that IMU calibration is complete
 
@@ -87,7 +88,30 @@ namespace Quad
 				// 6) Determine setpoints for pitch, roll, yaw,and altitude
 				pid.determineSetpoints(mReceiverChannel1, mReceiverChannel2, mReceiverChannel3, mReceiverChannel4);
 
-				// 7)
+				// 7) Determine PWM value for each motor
+				if (quadStateEnum::READY_FOR_FLIGHT == mQuadState)
+				{
+					// Determine setpoints
+						// Currently step 6
+
+					// Read gyro and filter data - results can be kept in imu class
+						// Currently steps 1 and 2
+
+					pid.determineAxisPID_Outputs();
+
+					// Determine mPWM_FrontLeft, mPWM_FrontRight, mPWM_RearLeft, and mPWM_RearRight
+
+					// Write signals to ESC class
+				}
+				else if(quadStateEnum::PREPARING_FOR_FLIGHT == mQuadState)
+				{
+					mPWM_FrontLeft = 1000;
+					mPWM_FrontRight = 1000;
+					mPWM_RearLeft = 1000;
+					mPWM_RearRight = 1000;
+
+					// Write signals to ESC class
+				}
 
 				// 8) Loop until 4ms since last loop has expired
 				std::this_thread::sleep_until(mLoopStartTime + std::chrono::milliseconds(4));
@@ -95,21 +119,10 @@ namespace Quad
 				
 
 				/*
-
-				6) Determine PID setpoints for pitch, roll, yaw,and altitude, i.e. max PWM signal of 2000us should correspond to +max rate, 1000us should correspond to -max rate, and 1500 should be zero
-
-				7) if READY_FOR_FLIGHT,
-					7a) throttle = receiver_channel_3;
-					7b) calculate the pid pitch, roll, and yaw outputs, i.e. the error between actual and desired, times by gain
-					7c) use these to determine value to send to each ESC
-				else
-					7d) set all ESC values to 1000us
-
-				
-
 				9) Work out how long from now the ESCs have to be high for, i.e. get current time, then add the value from either 7c or 7d to this time.
-
+					Do in ESC class
 				10) Set all ESCs to high
+					Do in ESC class
 
 				11) While any of the ESCs are still high, loop on the following
 					11a) - for each ESC output, check if the current time is less than the time when the output should go low. If less, stay high, otherwise go low.
