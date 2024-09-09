@@ -21,6 +21,13 @@ static const float PID_I_YAW_GAIN = 0.02f;
 static const float PID_D_YAW_GAIN = 0.0f;
 static const int max_yaw_rate = 250; //Max yaw rate
 
+static const float PID_P_ALTITUDE_GAIN = 3.0f;
+static const float PID_I_ALTITUDE_GAIN = 0.02f;
+static const float PID_D_ALTITUDE_GAIN = 0.0f;
+static const int max_altitude = 10; // Units: metres
+
+static const int THROTTLE_INTERRUPT_PIN = 17;
+
 namespace Quad
 {
 	namespace Loop
@@ -42,6 +49,7 @@ namespace Quad
 			void run();
 
 		private:
+			// Member variables
 			short mRawIMU_GyroPitchData;
 			short mRawIMU_GyroRollData;
 			short mRawIMU_GyroYawData;
@@ -66,6 +74,10 @@ namespace Quad
 			unsigned int mReceiverChannel4;
 
 			std::chrono::system_clock::time_point mLoopStartTime;
+
+		private:
+			// Member functions
+			void rcInterruptHandler(int gpio, int level, uint32_t tick);
 
 		};
 

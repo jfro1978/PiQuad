@@ -1,6 +1,7 @@
 #include "loop.h"
 #include "imu.h"
 #include "pid.h"
+#include <pigpio.h>
 #include <chrono>
 #include <thread>
 
@@ -19,10 +20,10 @@ namespace Quad
 			mAccelY(0),
 			mAccelZ(0),
 			mQuadState(quadStateEnum::STANDBY),
-			mReceiverChannel1(1000),
-			mReceiverChannel2(1000),
+			mReceiverChannel1(1500), // Hardcoded while developing altitude control algorithm
+			mReceiverChannel2(1500), // Hardcoded while developing altitude control algorithm
 			mReceiverChannel3(1000),
-			mReceiverChannel4(1000),
+			mReceiverChannel4(1500), // Hardcoded while developing altitude control algorithm
 			mLoopStartTime(std::chrono::system_clock::now())
 		{
 		}
@@ -40,9 +41,9 @@ namespace Quad
 			// Set LED to indicate that IMU calibration is complete
 
 			// Create PID controller object
-			Quad::PID::pidController pid(PID_P_PITCH_GAIN, PID_P_ROLL_GAIN, PID_P_YAW_GAIN,
-				PID_I_PITCH_GAIN, PID_I_ROLL_GAIN, PID_I_YAW_GAIN,
-				PID_D_PITCH_GAIN, PID_D_ROLL_GAIN, PID_D_YAW_GAIN);
+			Quad::PID::pidController pid(PID_P_PITCH_GAIN, PID_P_ROLL_GAIN, PID_P_YAW_GAIN, PID_P_ALTITUDE_GAIN,
+				PID_I_PITCH_GAIN, PID_I_ROLL_GAIN, PID_I_YAW_GAIN, PID_I_ALTITUDE_GAIN,
+				PID_D_PITCH_GAIN, PID_D_ROLL_GAIN, PID_D_YAW_GAIN, PID_D_ALTITUDE_GAIN);
 
 			while (1)
 			{
@@ -83,7 +84,8 @@ namespace Quad
 					mQuadState = quadStateEnum::STANDBY;
 				}
 
-				// 6)
+				// 6) Determine setpoints for pitch, roll, yaw,and altitude
+				pid.determineSetpoints(mReceiverChannel1, mReceiverChannel2, mReceiverChannel3, mReceiverChannel4);
 
 				// 7)
 
@@ -94,7 +96,7 @@ namespace Quad
 
 				/*
 
-				6) Determine PID setpoints for pitch, roll, and yaw, i.e. max PWM signal of 2000us should correspond to +max rate, 1000us should correspond to -max rate, and 1500 should be zero
+				6) Determine PID setpoints for pitch, roll, yaw,and altitude, i.e. max PWM signal of 2000us should correspond to +max rate, 1000us should correspond to -max rate, and 1500 should be zero
 
 				7) if READY_FOR_FLIGHT,
 					7a) throttle = receiver_channel_3;
@@ -146,6 +148,16 @@ namespace Quad
 			}
 
 			*/
+		}
+
+		void Loop::rcInterruptHandler(int gpio, int level, uint32_t tick) 
+		{
+			if (level == 1) {
+				std::cout << "Rising edge detected on GPIO " << gpio << std::endl;
+			}
+			else if (level == 0) {
+				std::cout << "Falling edge detected on GPIO " << gpio << std::endl;
+			}
 		}
 
 	} // namespace Loop
