@@ -80,15 +80,38 @@ namespace Quad
 
 		}
 
-		void pidController::determineAxisPID_Outputs()
+		void pidController::determineAxisPID_Outputs(short currentPitch, short currentRoll, short currentYaw,
+			short currentZ_accel)
 		{
-			// Pitch - 'stubbed'
-			// Need setpoints, and current axis info, e.g. current roll rate, etc
-			float pitchError = current pitch info - mPitchSetpoint;
+			// Pitch 
+			{
+				// Calculate error between actual pitch rate and desired pitch rate
+				float pitchError = currentPitch - mPitchSetpoint;
 
-			// Roll - 'stubbed'
+				// Calculate Proportional (P) control contribution to overall pitch output
+				mPID_P_PitchOutput = pitchError * mP_GainPitch;
 
-			// Yaw - 'stubbed'
+				// Calculate Integral (I) control contribution to overall pitch output
+				mPID_I_PitchOutput = mPID_I_Pitch_Output_Previous + (pitchError * mI_GainPitch);
+
+				// Calculate Derivative (D) control contribution to overall pitch output
+				mPID_D_PitchOutput = (pitchError - mPID_Error_Pitch_Previous) * mD_GainPitch;
+
+				// Calculate overall pitch output
+				mPID_PitchOutput = mPID_P_PitchOutput + mPID_I_PitchOutput + mPID_D_PitchOutput;
+
+				/* Can do a check here to ensure the max pitch rate is not exceeded, but probably not needed for now.*/
+
+				// Assign current values to 'previous' members to be used in next loop iteration
+				mPID_I_Pitch_Output_Previous = mPID_I_PitchOutput;
+				mPID_Error_Pitch_Previous = pitchError;
+			}
+
+			// Roll 
+			float rollError = currentPitch - mPitchSetpoint;
+
+			// Yaw 
+			float yawError = currentPitch - mPitchSetpoint;
 
 			// Altitude
 		}

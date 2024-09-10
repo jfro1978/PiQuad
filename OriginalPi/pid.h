@@ -18,7 +18,8 @@ namespace Quad
 			void determineSetpoints(unsigned int channel1,
 				unsigned int channel2, unsigned int channel3, unsigned int channel4);
 
-			void determineAxisPID_Outputs();
+			void determineAxisPID_Outputs(short currentPitch, short currentRoll, short currentYaw, 
+				short currentZ_accel);
 
 		private:
 			// Proportional gain values
@@ -39,11 +40,11 @@ namespace Quad
 			float mD_GainYaw;
 			float mD_GainAltitude;
 
-			// Controller loop error values
-			float mPID_I_Roll_Output_Previous;
-			float mPID_Error_Roll_Previous;
+			// Previous controller loop error values
 			float mPID_I_Pitch_Output_Previous;
 			float mPID_Error_Pitch_Previous;
+			float mPID_I_Roll_Output_Previous;
+			float mPID_Error_Roll_Previous;
 			float mPID_I_Yaw_Output_Previous;
 			float mPID_Error_Yaw_Previous;
 
@@ -52,6 +53,22 @@ namespace Quad
 			int mRollSetpoint;
 			int mYawSetpoint;
 			unsigned int mAltitudeSetpoint;
+
+			// P, I, and D contributions to each axis control signal
+			float mPID_P_PitchOutput;
+			float mPID_I_PitchOutput;
+			float mPID_D_PitchOutput;
+			float mPID_PitchOutput;
+
+			float mPID_P_RollOutput;
+			float mPID_I_RollOutput;
+			float mPID_D_RollOutput;
+			float mPID_RollOutput;
+
+			float mPID_P_YawOutput;
+			float mPID_I_YawOutput;
+			float mPID_D_YawOutput;
+			float mPID_YawOutput;
 		};
 
 	} // namespace PID

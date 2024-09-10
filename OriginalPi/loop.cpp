@@ -48,27 +48,14 @@ namespace Quad
 
 			while (1)
 			{
-				// 1) Read gyro
-				mpu6050.readIMU_Data(mRawIMU_GyroPitchData, mRawIMU_GyroRollData, mRawIMU_GyroYawData,
-					mRawIMU_AccelX_Data, mRawIMU_AccelY_Data, mRawIMU_AccelZ_Data);
-
-				// 2) Filter the IMU data to limit the effect of spikes in the received IMU data
-				mGyroPitch = (mGyroPitch * IMU_DATA_FILTER) + (mRawIMU_GyroPitchData * IMU_DATA_FILTER);
-				mGyroRoll = (mGyroRoll * IMU_DATA_FILTER) + (mRawIMU_GyroRollData * IMU_DATA_FILTER);
-				mGyroYaw = (mGyroYaw * IMU_DATA_FILTER) + (mRawIMU_GyroYawData * IMU_DATA_FILTER);
-
-				mAccelX = (mAccelX * IMU_DATA_FILTER) + (mRawIMU_AccelX_Data * IMU_DATA_FILTER);
-				mAccelY = (mAccelY * IMU_DATA_FILTER) + (mRawIMU_AccelY_Data * IMU_DATA_FILTER);
-				mAccelZ = (mAccelZ * IMU_DATA_FILTER) + (mRawIMU_AccelZ_Data * IMU_DATA_FILTER);
-
-				// 3) Check conditions for getting quad ready for flight, i.e.changing state of quadStateEnum variable
+				// Check conditions for preparing quad for flight
 				if (mReceiverChannel3 < 1050 && mReceiverChannel4 < 1050)
 				{
 					mQuadState = quadStateEnum::PREPARING_FOR_FLIGHT;
 				}
 
-				/* 4) Check if state has just transitioned from PREPARING_FOR_FLIGHT to READY_FOR_FLIGHT.
-					  If so, reset historical PID error values. */
+				/* Check if state has just transitioned from PREPARING_FOR_FLIGHT to READY_FOR_FLIGHT.
+					If so, reset historical PID error values. */
 				if ((mQuadState == quadStateEnum::PREPARING_FOR_FLIGHT) &&
 					(mReceiverChannel3 < 1050) &&
 					(mReceiverChannel4 > 1450))
@@ -77,7 +64,7 @@ namespace Quad
 					mQuadState = quadStateEnum::READY_FOR_FLIGHT;
 				}
 
-				// 5) Check conditions for stopping flight, i.e. to move back to STANDBY
+				// Check conditions for stopping flight, i.e. to move back to STANDBY
 				if ((mQuadState == quadStateEnum::READY_FOR_FLIGHT) &&
 					(mReceiverChannel3 < 1050) &&
 					(mReceiverChannel4 > 1950))
@@ -85,17 +72,31 @@ namespace Quad
 					mQuadState = quadStateEnum::STANDBY;
 				}
 
-				// 6) Determine setpoints for pitch, roll, yaw,and altitude
-				pid.determineSetpoints(mReceiverChannel1, mReceiverChannel2, mReceiverChannel3, mReceiverChannel4);
-
-				// 7) Determine PWM value for each motor
+				// Determine PWM value for each motor if quad is ready for flight
 				if (quadStateEnum::READY_FOR_FLIGHT == mQuadState)
 				{
-					// Determine setpoints
-						// Currently step 6
+					/* Impose upper limit (PWM: 1800) on throttle setting, then determine setpoints for pitch, 
+						roll, yaw, and altitude. This is done to ensure that even at the max throttle setting, 
+						there is still some (PWM) margin available to stabilise the quad. */
 
-					// Read gyro and filter data - results can be kept in imu class
-						// Currently steps 1 and 2
+					if (mReceiverChannel3 > 1800)
+					{
+						mReceiverChannel3 = 1800;
+					}
+					pid.determineSetpoints(mReceiverChannel1, mReceiverChannel2, mReceiverChannel3, mReceiverChannel4);
+
+					// Read gyro values
+					mpu6050.readIMU_Data(mRawIMU_GyroPitchData, mRawIMU_GyroRollData, mRawIMU_GyroYawData,
+						mRawIMU_AccelX_Data, mRawIMU_AccelY_Data, mRawIMU_AccelZ_Data);
+
+					// Filter the IMU data to limit the effect of spikes in the received IMU data
+					mGyroPitch = (mGyroPitch * IMU_DATA_FILTER) + (mRawIMU_GyroPitchData * IMU_DATA_FILTER);
+					mGyroRoll = (mGyroRoll * IMU_DATA_FILTER) + (mRawIMU_GyroRollData * IMU_DATA_FILTER);
+					mGyroYaw = (mGyroYaw * IMU_DATA_FILTER) + (mRawIMU_GyroYawData * IMU_DATA_FILTER);
+
+					mAccelX = (mAccelX * IMU_DATA_FILTER) + (mRawIMU_AccelX_Data * IMU_DATA_FILTER);
+					mAccelY = (mAccelY * IMU_DATA_FILTER) + (mRawIMU_AccelY_Data * IMU_DATA_FILTER);
+					mAccelZ = (mAccelZ * IMU_DATA_FILTER) + (mRawIMU_AccelZ_Data * IMU_DATA_FILTER);
 
 					pid.determineAxisPID_Outputs();
 
