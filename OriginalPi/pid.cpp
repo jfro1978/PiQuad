@@ -1,4 +1,5 @@
 #include "pid.h"
+#include <chrono>
 
 static const unsigned int MINIMUM_PID_VALUE = 1000;
 static const float ALTITUDE_SCALING_FACTOR = 0.01; // Units: metres per increment of PWM signal
@@ -27,7 +28,13 @@ namespace Quad
 			mPID_I_Pitch_Output_Previous(0.0f),
 			mPID_Error_Pitch_Previous(0.0f),
 			mPID_I_Yaw_Output_Previous(0.0f),
-			mPID_Error_Yaw_Previous(0.0f)
+			mPID_Error_Yaw_Previous(0.0f),
+			mPID_I_Altitude_Output_Previous(0.0f),
+			mPID_Error_Altitude_Previous(0.0f),
+			mLastCalculationTime(std::chrono::high_resolution_clock::now()),
+			mLastLoopAltitude(0.0f),
+			mLastLoopVelocity(0.0f),
+			mLastZ_AccelValue(0.0f)
 		{
 		}
 
@@ -39,6 +46,8 @@ namespace Quad
 			mPID_Error_Pitch_Previous = 0.0f;
 			mPID_I_Yaw_Output_Previous = 0.0f;
 			mPID_Error_Yaw_Previous = 0.0f;
+			mPID_I_Altitude_Output_Previous = 0.0f;
+			mPID_Error_Altitude_Previous = 0.0f;
 		}
 		void pidController::determineSetpoints(unsigned int channel1, unsigned int channel2, unsigned int channel3, unsigned int channel4)
 		{
@@ -114,6 +123,39 @@ namespace Quad
 			float yawError = currentPitch - mPitchSetpoint;
 
 			// Altitude
+
+				// Integrate to get velocity (area under acceleration v time curve)
+				std::chrono::system_clock::time_point currentTime = std::chrono::high_resolution_clock::now();
+				std::chrono::duration<double> timeDelta = currentTime - mLastCalculationTime;
+				float currentVelocity = mLastLoopVelocity + (timeDelta.count() * currentZ_accel);
+
+				// Determine current altitude using s = s0 + ut + 1/2*a*t^2
+				float currentAltitude = mLastLoopAltitude + (currentVelocity * timeDelta.count()) +
+					(0.5f * currentZ_accel * timeDelta.count() * timeDelta.count());
+
+				// Set current values to be used as last values in next calculation
+				mLastCalculationTime = currentTime;
+				mLastLoopAltitude = currentAltitude;
+				mLastLoopVelocity = currentVelocity;
+				 
+				// Determine altitude error
+				float altitudeError = currentAltitude - mAltitudeSetpoint;
+
+				// Calculate Proportional (P) control contribution to overall throttle output
+				mPID_P_ThrottleOutput = altitudeError * mP_GainAltitude;
+
+				// Calculate Integral (I) control contribution to overall throttle output
+				mPID_I_ThrottleOutput = mPID_I_Altitude_Output_Previous + (altitudeError * mI_GainAltitude);
+
+				// Calculate Derivative (D) control contribution to overall throttle output
+				mPID_D_ThrottleOutput = (altitudeError - mPID_Error_Altitude_Previous) * mD_GainAltitude;
+
+				// Calculate overall altitude output
+				mPID_ThrottleOutput = mPID_P_ThrottleOutput + mPID_I_ThrottleOutput + mPID_D_ThrottleOutput;
+
+				// Assign current values to 'previous' members to be used in next loop iteration
+				mPID_I_Altitude_Output_Previous = mPID_I_ThrottleOutput;
+				mPID_Error_Altitude_Previous = altitudeError;
 		}
 	} // namespace PID
 } // namespace Quad

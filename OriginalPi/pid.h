@@ -47,6 +47,8 @@ namespace Quad
 			float mPID_Error_Roll_Previous;
 			float mPID_I_Yaw_Output_Previous;
 			float mPID_Error_Yaw_Previous;
+			float mPID_I_Altitude_Output_Previous;
+			float mPID_Error_Altitude_Previous;
 
 			// Setpoints
 			int mPitchSetpoint;
@@ -69,6 +71,15 @@ namespace Quad
 			float mPID_I_YawOutput;
 			float mPID_D_YawOutput;
 			float mPID_YawOutput;
+
+			float mPID_P_ThrottleOutput;
+			float mPID_I_ThrottleOutput;
+			float mPID_D_ThrottleOutput;
+			float mPID_ThrottleOutput;
+			std::chrono::system_clock::time_point mLastCalculationTime;
+			float mLastLoopAltitude;
+			float mLastLoopVelocity;
+			float mLastZ_AccelValue;
 		};
 
 	} // namespace PID
