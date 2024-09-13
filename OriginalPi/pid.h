@@ -21,6 +21,11 @@ namespace Quad
 			void determineAxisPID_Outputs(short currentPitch, short currentRoll, short currentYaw, 
 				short currentZ_accel);
 
+			float getPID_PitchOutput();
+			float getPID_RollOutput();
+			float getPID_YawOutput();
+			float getPID_ThrottleOutput();
+
 		private:
 			// Proportional gain values
 			float mP_GainPitch;

@@ -200,6 +200,22 @@ namespace Quad
 				mPID_Error_Altitude_Previous = altitudeError;
 			}
 		}
+		float pidController::getPID_PitchOutput()
+		{
+			return mPID_PitchOutput;
+		}
+		float pidController::getPID_RollOutput()
+		{
+			return mPID_RollOutput;
+		}
+		float pidController::getPID_YawOutput()
+		{
+			return mPID_YawOutput;
+		}
+		float pidController::getPID_ThrottleOutput()
+		{
+			return mPID_ThrottleOutput;
+		}
 	} // namespace PID
 } // namespace Quad
  

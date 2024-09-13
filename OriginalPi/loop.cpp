@@ -46,7 +46,7 @@ namespace Quad
 				PID_I_PITCH_GAIN, PID_I_ROLL_GAIN, PID_I_YAW_GAIN, PID_I_ALTITUDE_GAIN,
 				PID_D_PITCH_GAIN, PID_D_ROLL_GAIN, PID_D_YAW_GAIN, PID_D_ALTITUDE_GAIN);
 
-			while (1)
+			while (true)
 			{
 				// Check conditions for preparing quad for flight
 				if (mReceiverChannel3 < 1050 && mReceiverChannel4 < 1050)
@@ -98,9 +98,19 @@ namespace Quad
 					mAccelY = (mAccelY * IMU_DATA_FILTER) + (mRawIMU_AccelY_Data * IMU_DATA_FILTER);
 					mAccelZ = (mAccelZ * IMU_DATA_FILTER) + (mRawIMU_AccelZ_Data * IMU_DATA_FILTER);
 
-					pid.determineAxisPID_Outputs();
+					pid.determineAxisPID_Outputs(mGyroPitch, mGyroRoll, mGyroYaw, mAccelZ);
 
-					// Determine mPWM_FrontLeft, mPWM_FrontRight, mPWM_RearLeft, and mPWM_RearRight
+					// Get control axis outputs
+					float pitch = pid.getPID_PitchOutput();
+					float roll = pid.getPID_RollOutput();
+					float yaw = pid.getPID_YawOutput();
+					float throttle = pid.getPID_ThrottleOutput();
+
+					// Determine PWM signal magnitude for each motor
+					int escFrontRight = throttle + roll - pitch + yaw;
+					int escFrontLeft = throttle - roll - pitch - yaw;
+					int escRearRight = throttle + roll + pitch - yaw;
+					int escRearLeft = throttle - roll + pitch + yaw;
 
 					// Write signals to ESC class
 				}
