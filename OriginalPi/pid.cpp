@@ -116,14 +116,56 @@ namespace Quad
 				mPID_Error_Pitch_Previous = pitchError;
 			}
 
-			// Roll 
-			float rollError = currentPitch - mPitchSetpoint;
+			// Roll
+			{
+				// Calculate error between actual roll rate and desired roll rate
+				float rollError = currentRoll - mRollSetpoint;
+
+				// Calculate Proportional (P) control contribution to overall roll output
+				mPID_P_RollOutput = rollError * mP_GainRoll;
+
+				// Calculate Integral (I) control contribution to overall roll output
+				mPID_I_RollOutput = mPID_I_Roll_Output_Previous + (rollError * mI_GainRoll);
+
+				// Calculate Derivative (D) control contribution to overall roll output
+				mPID_D_RollOutput = (rollError - mPID_Error_Roll_Previous) * mD_GainRoll;
+
+				// Calculate overall roll output
+				mPID_RollOutput = mPID_P_RollOutput + mPID_I_RollOutput + mPID_D_RollOutput;
+
+				/* Can do a check here to ensure the max roll rate is not exceeded, but probably not needed for now.*/
+
+				// Assign current values to 'previous' members to be used in next loop iteration
+				mPID_I_Roll_Output_Previous = mPID_I_RollOutput;
+				mPID_Error_Roll_Previous = rollError;
+			}
 
 			// Yaw 
-			float yawError = currentPitch - mPitchSetpoint;
+			{
+				// Calculate error between actual yaw rate and desired yaw rate
+				float yawError = currentYaw - mYawSetpoint;
+
+				// Calculate Proportional (P) control contribution to overall yaw output
+				mPID_P_YawOutput = yawError * mP_GainYaw;
+
+				// Calculate Integral (I) control contribution to overall yaw output
+				mPID_I_YawOutput = mPID_I_Yaw_Output_Previous + (yawError * mI_GainYaw);
+
+				// Calculate Derivative (D) control contribution to overall yaw output
+				mPID_D_YawOutput = (yawError - mPID_Error_Yaw_Previous) * mD_GainYaw;
+
+				// Calculate overall yaw output
+				mPID_YawOutput = mPID_P_YawOutput + mPID_I_YawOutput + mPID_D_YawOutput;
+
+				/* Can do a check here to ensure the max yaw rate is not exceeded, but probably not needed for now.*/
+
+				// Assign current values to 'previous' members to be used in next loop iteration
+				mPID_I_Yaw_Output_Previous = mPID_I_YawOutput;
+				mPID_Error_Yaw_Previous = yawError;
+			}
 
 			// Altitude
-
+			{
 				// Integrate to get velocity (area under acceleration v time curve)
 				std::chrono::system_clock::time_point currentTime = std::chrono::high_resolution_clock::now();
 				std::chrono::duration<double> timeDelta = currentTime - mLastCalculationTime;
@@ -137,7 +179,7 @@ namespace Quad
 				mLastCalculationTime = currentTime;
 				mLastLoopAltitude = currentAltitude;
 				mLastLoopVelocity = currentVelocity;
-				 
+
 				// Determine altitude error
 				float altitudeError = currentAltitude - mAltitudeSetpoint;
 
@@ -156,6 +198,7 @@ namespace Quad
 				// Assign current values to 'previous' members to be used in next loop iteration
 				mPID_I_Altitude_Output_Previous = mPID_I_ThrottleOutput;
 				mPID_Error_Altitude_Previous = altitudeError;
+			}
 		}
 	} // namespace PID
 } // namespace Quad
