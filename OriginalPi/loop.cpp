@@ -3,6 +3,7 @@
 #include "pid.h"
 #include <chrono>
 #include <thread>
+#include <iostream>
 
 namespace Quad
 {
@@ -58,15 +59,15 @@ namespace Quad
 
 
 			// Set GPIO receiver pins to input mode
-			pinMode(rxCh1Pin, INPUT);
+			/*pinMode(rxCh1Pin, INPUT);
 			pinMode(rxCh2Pin, INPUT);
 			pinMode(rxCh3Pin, INPUT);
-			pinMode(rxCh4Pin, INPUT);
+			pinMode(rxCh4Pin, INPUT);*/
 
-			// Initialize wiringPi and check for errors
-			if (wiringPiSetup() == -1) {
-				throw std::runtime_error("Error initializing wiringPi!");
-			}
+			//// Initialize wiringPi and check for errors
+			//if (wiringPiSetup() == -1) {
+			//	throw std::runtime_error("Error initializing wiringPi!");
+			//}
 
 			//// Attach interrupt handlers for each pin
 			//if (wiringPiISR(rxCh1Pin, INT_EDGE_BOTH, &Loop::interruptHandlerPin7) < 0) {
@@ -77,28 +78,28 @@ namespace Quad
 			while (true)
 			{
 				// Check conditions for preparing quad for flight
-				if (mReceiverChannel3 < 1050 && mReceiverChannel4 < 1050)
+				/*if (mReceiverChannel3 < 1050 && mReceiverChannel4 < 1050)
 				{
 					mQuadState = quadStateEnum::PREPARING_FOR_FLIGHT;
-				}
+				}*/
 
 				/* Check if state has just transitioned from PREPARING_FOR_FLIGHT to READY_FOR_FLIGHT.
 					If so, reset historical PID error values. */
-				if ((mQuadState == quadStateEnum::PREPARING_FOR_FLIGHT) &&
+				/*if ((mQuadState == quadStateEnum::PREPARING_FOR_FLIGHT) &&
 					(mReceiverChannel3 < 1050) &&
 					(mReceiverChannel4 > 1450))
 				{
-					pid.resetPreviousErrorValues();
+					pid.resetPreviousErrorValues();*/
 					mQuadState = quadStateEnum::READY_FOR_FLIGHT;
-				}
+				//}
 
 				// Check conditions for stopping flight, i.e. to move back to STANDBY
-				if ((mQuadState == quadStateEnum::READY_FOR_FLIGHT) &&
+				/*if ((mQuadState == quadStateEnum::READY_FOR_FLIGHT) &&
 					(mReceiverChannel3 < 1050) &&
 					(mReceiverChannel4 > 1950))
 				{
 					mQuadState = quadStateEnum::STANDBY;
-				}
+				}*/
 
 				// Determine PWM value for each motor if quad is ready for flight
 				if (quadStateEnum::READY_FOR_FLIGHT == mQuadState)
@@ -125,6 +126,9 @@ namespace Quad
 					mAccelX = (mAccelX * IMU_DATA_FILTER) + (mRawIMU_AccelX_Data * IMU_DATA_FILTER);
 					mAccelY = (mAccelY * IMU_DATA_FILTER) + (mRawIMU_AccelY_Data * IMU_DATA_FILTER);
 					mAccelZ = (mAccelZ * IMU_DATA_FILTER) + (mRawIMU_AccelZ_Data * IMU_DATA_FILTER);
+
+					std::cout << "Pitch: " << mGyroPitch << ", Roll: " << mGyroRoll << ", Yaw: " << mGyroYaw <<
+						", Accel X: " << mAccelX << ", Accel Y: " << mAccelY << ", Accel Z: " << mAccelZ << std::endl;
 
 					pid.determineAxisPID_Outputs(mGyroPitch, mGyroRoll, mGyroYaw, mAccelZ);
 
@@ -157,7 +161,7 @@ namespace Quad
 				}
 
 				// 8) Loop until 4ms since last loop has expired
-				std::this_thread::sleep_until(mLoopStartTime + std::chrono::milliseconds(4));
+				std::this_thread::sleep_until(mLoopStartTime + std::chrono::milliseconds(500));
 				mLoopStartTime = std::chrono::system_clock::now();
 				
 
