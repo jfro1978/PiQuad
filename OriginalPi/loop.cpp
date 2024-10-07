@@ -1,7 +1,6 @@
 #include "loop.h"
 #include "imu.h"
 #include "pid.h"
-#include <pigpio.h>
 #include <chrono>
 #include <thread>
 
@@ -24,7 +23,15 @@ namespace Quad
 			mReceiverChannel2(1500), // Hardcoded while developing altitude control algorithm
 			mReceiverChannel3(1000),
 			mReceiverChannel4(1500), // Hardcoded while developing altitude control algorithm
-			mLoopStartTime(std::chrono::system_clock::now())
+			mLoopStartTime(std::chrono::system_clock::now()),
+			rxCh1Pin(1),
+			rxCh2Pin(2),
+			rxCh3Pin(3),
+			rxCh4Pin(4),
+			ch1PinLastLevel(0),
+			ch2PinLastLevel(0),
+			ch3PinLastLevel(0),
+			ch4PinLastLevel(0)
 		{
 		}
 
@@ -45,6 +52,27 @@ namespace Quad
 			Quad::PID::pidController pid(PID_P_PITCH_GAIN, PID_P_ROLL_GAIN, PID_P_YAW_GAIN, PID_P_ALTITUDE_GAIN,
 				PID_I_PITCH_GAIN, PID_I_ROLL_GAIN, PID_I_YAW_GAIN, PID_I_ALTITUDE_GAIN,
 				PID_D_PITCH_GAIN, PID_D_ROLL_GAIN, PID_D_YAW_GAIN, PID_D_ALTITUDE_GAIN);
+
+			// Create interrupt handler
+			// TODO: Find more appropriate location for this code
+
+
+			// Set GPIO receiver pins to input mode
+			pinMode(rxCh1Pin, INPUT);
+			pinMode(rxCh2Pin, INPUT);
+			pinMode(rxCh3Pin, INPUT);
+			pinMode(rxCh4Pin, INPUT);
+
+			// Initialize wiringPi and check for errors
+			if (wiringPiSetup() == -1) {
+				throw std::runtime_error("Error initializing wiringPi!");
+			}
+
+			//// Attach interrupt handlers for each pin
+			//if (wiringPiISR(rxCh1Pin, INT_EDGE_BOTH, &Loop::interruptHandlerPin7) < 0) {
+			//	throw std::runtime_error("Error initializing wiringPi!");
+			//}
+
 
 			while (true)
 			{
@@ -107,12 +135,16 @@ namespace Quad
 					float throttle = pid.getPID_ThrottleOutput();
 
 					// Determine PWM signal magnitude for each motor
+					// The +/- sign for each axis depends on the orientation of the IMU
+					// If positive feedback occurs on a specific axis, need to change the sign for that axis
 					int escFrontRight = throttle + roll - pitch + yaw;
 					int escFrontLeft = throttle - roll - pitch - yaw;
 					int escRearRight = throttle + roll + pitch - yaw;
 					int escRearLeft = throttle - roll + pitch + yaw;
 
 					// Write signals to ESC class
+
+					// Write data to SD card
 				}
 				else if(quadStateEnum::PREPARING_FOR_FLIGHT == mQuadState)
 				{
@@ -174,15 +206,29 @@ namespace Quad
 			*/
 		}
 
-		void Loop::rcInterruptHandler(int gpio, int level, uint32_t tick) 
+		void Loop::interruptHandlerPin7(void)
 		{
-			if (level == 1) {
-				std::cout << "Rising edge detected on GPIO " << gpio << std::endl;
+			int pin7State = digitalRead(rxCh1Pin);
+			if ((pin7State == 1) && (ch1PinLastLevel == 0))
+			{
+				ch1PinLastLevel = 1;
+				mRxCh1StartTime = std::chrono::system_clock::now();
 			}
-			else if (level == 0) {
-				std::cout << "Falling edge detected on GPIO " << gpio << std::endl;
-			}
+			else if ((pin7State == 0) && (ch1PinLastLevel == 1))
+			{
+				ch1PinLastLevel = 0;
+				//mReceiverChannel1 = std::chrono::system_clock::now() - mRxCh1StartTime;
+			}	
 		}
+
+		void Loop::interruptHandlerPin8(void)
+		{}
+
+		void Loop::interruptHandlerPin9(void)
+		{}
+
+		void Loop::interruptHandlerPin10(void)
+		{}
 
 	} // namespace Loop
 } // namespace Quad

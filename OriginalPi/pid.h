@@ -1,6 +1,8 @@
 #ifndef _PID_CLASS
 #define _PID_CLASS
 
+#include <chrono>
+
 namespace Quad
 {
 	namespace PID
@@ -8,10 +10,10 @@ namespace Quad
 		class pidController {
 		public:
 			// Constructor and Destructor
-			pidController::pidController(float pGainPitch, float pGainRoll, float pGainYaw, float pGainAltitude,
+			pidController(float pGainPitch, float pGainRoll, float pGainYaw, float pGainAltitude,
 				float iGainPitch, float iGainRoll, float iGainYaw, float iGainAltitude,
 				float dGainPitch, float dGainRoll, float dGainYaw, float dGainAltitude);
-			pidController::~pidController() = default;
+			~pidController() = default;
 
 		public:
 			void resetPreviousErrorValues();

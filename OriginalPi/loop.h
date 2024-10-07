@@ -3,6 +3,7 @@
 
 #include "imu.h"
 #include "pid.h"
+#include <wiringPi.h>
 
 static const float IMU_DATA_FILTER = 0.5;
 
@@ -80,9 +81,25 @@ namespace Quad
 			unsigned int mPWM_RearRight;
 			unsigned int mPWM_RearLeft;
 
+			uint8_t rxCh1Pin;
+			uint8_t ch1PinLastLevel;
+			std::chrono::system_clock::time_point mRxCh1StartTime;
+			uint8_t rxCh2Pin;
+			uint8_t ch2PinLastLevel;
+			std::chrono::system_clock::time_point mRxCh2StartTime;
+			uint8_t rxCh3Pin;
+			uint8_t ch3PinLastLevel;
+			std::chrono::system_clock::time_point mRxCh3StartTime;
+			uint8_t rxCh4Pin;
+			uint8_t ch4PinLastLevel;
+			std::chrono::system_clock::time_point mRxCh4StartTime;
+
 		private:
 			// Member functions
-			void rcInterruptHandler(int gpio, int level, uint32_t tick);
+			void interruptHandlerPin7(void);
+			void interruptHandlerPin8(void);
+			void interruptHandlerPin9(void);
+			void interruptHandlerPin10(void);
 
 		};
 
