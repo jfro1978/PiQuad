@@ -51,13 +51,13 @@ namespace Quad
 
 		private:
 			// Member variables
-			short mRawIMU_GyroPitchData;
-			short mRawIMU_GyroRollData;
-			short mRawIMU_GyroYawData;
+			float mRawIMU_GyroPitchData;
+			float mRawIMU_GyroRollData;
+			float mRawIMU_GyroYawData;
 
-			short mRawIMU_AccelX_Data;
-			short mRawIMU_AccelY_Data;
-			short mRawIMU_AccelZ_Data;
+			float mRawIMU_AccelX_Data;
+			float mRawIMU_AccelY_Data;
+			float mRawIMU_AccelZ_Data;
 
 			short mGyroPitch;
 			short mGyroRoll;

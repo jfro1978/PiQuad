@@ -4,31 +4,29 @@
 #include <unistd.h> // Needed for closing the I2C connection
 #include <wiringPiI2C.h>
 
-// Define the I2C address of the IMU
-static constexpr int IMU_address = 0b1101000;
 
-// IMU register addresses
-static constexpr int GYRO_CONFIG_REGISTER_ADDRESS = 0x1B;
-static constexpr int ACCEL_CONFIG_REGISTER_ADDRESS = 0x1C;
-static constexpr int PWR_MGMT_1_REGISTER_ADDRESS = 0x6B;
 
-static constexpr int ACCEL_XOUT_H_REGISTER_ADDRESS = 0x3B;
-static constexpr int ACCEL_XOUT_L_REGISTER_ADDRESS = 0x3C;
-
-static constexpr int ACCEL_YOUT_H_REGISTER_ADDRESS = 0x3D;
-static constexpr int ACCEL_YOUT_L_REGISTER_ADDRESS = 0x3E;
-
-static constexpr int ACCEL_ZOUT_H_REGISTER_ADDRESS = 0x3F;
-static constexpr int ACCEL_ZOUT_L_REGISTER_ADDRESS = 0x40;
-
-static constexpr int GYRO_XOUT_H_REGISTER_ADDRESS = 0x43;
-static constexpr int GYRO_XOUT_L_REGISTER_ADDRESS = 0x44;
-
-static constexpr int GYRO_YOUT_H_REGISTER_ADDRESS = 0x45;
-static constexpr int GYRO_YOUT_L_REGISTER_ADDRESS = 0x46;
-
-static constexpr int GYRO_ZOUT_H_REGISTER_ADDRESS = 0x47;
-static constexpr int GYRO_ZOUT_L_REGISTER_ADDRESS = 0x48;
+//static constexpr int GYRO_CONFIG_REGISTER_ADDRESS = 0x1B;
+//static constexpr int ACCEL_CONFIG_REGISTER_ADDRESS = 0x1C;
+//static constexpr int PWR_MGMT_1_REGISTER_ADDRESS = 0x6B;
+//
+//static constexpr int ACCEL_XOUT_H_REGISTER_ADDRESS = 0x3B;
+//static constexpr int ACCEL_XOUT_L_REGISTER_ADDRESS = 0x3C;
+//
+//static constexpr int ACCEL_YOUT_H_REGISTER_ADDRESS = 0x3D;
+//static constexpr int ACCEL_YOUT_L_REGISTER_ADDRESS = 0x3E;
+//
+//static constexpr int ACCEL_ZOUT_H_REGISTER_ADDRESS = 0x3F;
+//static constexpr int ACCEL_ZOUT_L_REGISTER_ADDRESS = 0x40;
+//
+//static constexpr int GYRO_XOUT_H_REGISTER_ADDRESS = 0x43;
+//static constexpr int GYRO_XOUT_L_REGISTER_ADDRESS = 0x44;
+//
+//static constexpr int GYRO_YOUT_H_REGISTER_ADDRESS = 0x45;
+//static constexpr int GYRO_YOUT_L_REGISTER_ADDRESS = 0x46;
+//
+//static constexpr int GYRO_ZOUT_H_REGISTER_ADDRESS = 0x47;
+//static constexpr int GYRO_ZOUT_L_REGISTER_ADDRESS = 0x48;
 
 namespace Quad
 {
@@ -60,11 +58,13 @@ namespace Quad
 
 			void initialiseIMU();
 
-			void readIMU_Data(short& gyroPitch, short& gyroRoll, short& gyroYaw,
-				short& accelX, short& accelY, short& accelZ);
+			void readIMU_Data(void/*float& gyroPitch, float& gyroRoll, float& gyroYaw,
+				float& accelX, float& accelY, float& accelZ*/);
 
 		private:
 			void calibrateIMU();
+
+			short read_raw_data(int addr);
 
 			void setIMU_MaxRates(const gyroConfigEnum& gyroCfg, const accelConfigEnum& accelCfg);
 
