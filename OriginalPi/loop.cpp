@@ -9,37 +9,6 @@ namespace Quad
 {
 	namespace Loop
 	{
-		int fd;
-		constexpr uint8_t Device_Address = 0x68;
-		constexpr uint8_t PWR_MGMT_1 = 0x6B;
-		constexpr uint8_t SMPLRT_DIV = 0x19;
-		constexpr uint8_t CONFIG = 0x1A;
-		constexpr uint8_t GYRO_CONFIG = 0x1B;
-		constexpr uint8_t INT_ENABLE = 0x38;
-		constexpr uint8_t ACCEL_XOUT_H = 0x3B;
-		constexpr uint8_t ACCEL_YOUT_H = 0x3D;
-		constexpr uint8_t ACCEL_ZOUT_H = 0x3F;
-		constexpr uint8_t GYRO_XOUT_H = 0x43;
-		constexpr uint8_t GYRO_YOUT_H = 0x45;
-		constexpr uint8_t GYRO_ZOUT_H = 0x47;
-
-		void MPU6050_Init() {
-
-			wiringPiI2CWriteReg8(fd, SMPLRT_DIV, 0x07);	/* Write to sample rate register */
-			wiringPiI2CWriteReg8(fd, PWR_MGMT_1, 0x01);	/* Write to power management register */
-			wiringPiI2CWriteReg8(fd, CONFIG, 0);		/* Write to Configuration register */
-			wiringPiI2CWriteReg8(fd, GYRO_CONFIG, 24);	/* Write to Gyro Configuration register */
-			wiringPiI2CWriteReg8(fd, INT_ENABLE, 0x01);	/* Write to interrupt enable register */
-		}
-
-		short read_raw_data(int addr) {
-			short high_byte, low_byte, value;
-			high_byte = wiringPiI2CReadReg8(fd, addr);
-			low_byte = wiringPiI2CReadReg8(fd, addr + 1);
-			value = (high_byte << 8) | low_byte;
-			return value;
-		}
-
 		Loop::Loop() :
 			mRawIMU_GyroPitchData(0),
 			mRawIMU_GyroRollData(0),
@@ -151,7 +120,11 @@ namespace Quad
 					/*mpu6050.readIMU_Data(mRawIMU_GyroPitchData, mRawIMU_GyroRollData, mRawIMU_GyroYawData,
 						mRawIMU_AccelX_Data, mRawIMU_AccelY_Data, mRawIMU_AccelZ_Data);*/
 
-				mpu6050.readIMU_Data();
+				float Gx, Gy, Gz, Ax, Ay, Az = 0.0f;
+
+				mpu6050.readIMU_Data(Gx, Gy, Gz, Ax, Ay, Az);
+
+				printf("\n Gx=%.3f deg/s\tGy=%.3f deg/s\tGz=%.3f deg/s\tAx=%.3f g\tAy=%.3f g\tAz=%.3f g\n", Gx, Gy, Gz, Ax, Ay, Az);
 
 						/*Read raw value of Accelerometer and gyroscope from MPU6050*/
 				//float Acc_x = read_raw_data(ACCEL_XOUT_H);
@@ -217,8 +190,8 @@ namespace Quad
 				//}
 
 				// 8) Loop until 4ms since last loop has expired
-				//std::this_thread::sleep_until(mLoopStartTime + std::chrono::milliseconds(10));
-				//mLoopStartTime = std::chrono::system_clock::now();
+				std::this_thread::sleep_until(mLoopStartTime + std::chrono::milliseconds(4));
+				mLoopStartTime = std::chrono::system_clock::now();
 				
 
 				/*
@@ -232,38 +205,6 @@ namespace Quad
 
 				*/
 			}
-
-
-			/*
-			short  x, y, z, a, b, c = 0;
-
-			while (true)
-			{
-				readIMU_Data(x, y, z, a, b, c);
-
-				float x1 = (x / GYRO_LSB_VALUE);
-				std::cout << "Gyro X: " << (x1 - offsetGyroPitch) << ", ";
-
-				float y1 = (y / GYRO_LSB_VALUE);
-				std::cout << "Gyro Y: " << (y1 - offsetGyroRoll) << ", ";
-
-				float z1 = (z / GYRO_LSB_VALUE);
-				std::cout << "Gyro Z: " << (z1 - offsetGyroYaw) << ", ";
-
-				float a1 = (a / ACCEL_LSB_VALUE);
-				std::cout << "Accel X: " << (a1 - offsetAccelX) << ", ";
-
-				float b1 = (b / ACCEL_LSB_VALUE);
-				std::cout << "Accel Y: " << (b1 - offsetAccelY) << ", ";
-
-				float c1 = (c / ACCEL_LSB_VALUE);
-				std::cout << "Accel Z: " << (c1 - offsetAccelZ) << std::endl;
-
-
-				usleep(10000);
-			}
-
-			*/
 		}
 
 		void Loop::interruptHandlerPin7(void)

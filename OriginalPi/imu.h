@@ -58,8 +58,8 @@ namespace Quad
 
 			void initialiseIMU();
 
-			void readIMU_Data(void/*float& gyroPitch, float& gyroRoll, float& gyroYaw,
-				float& accelX, float& accelY, float& accelZ*/);
+			void readIMU_Data(float& gyroPitch, float& gyroRoll, float& gyroYaw,
+				float& accelX, float& accelY, float& accelZ);
 
 		private:
 			void calibrateIMU();
@@ -70,18 +70,18 @@ namespace Quad
 
 			int imuHandle;
 
-			float GYRO_LSB_VALUE; // See p29/46 of register map document
-			float ACCEL_LSB_VALUE; // See p31/46 of register map document
+			float gyroLSB_Value; // See p29/46 of register map document
+			int accelLSB_Value; // See p31/46 of register map document
 
 			gyroConfigEnum gyroFullScale = gyroConfigEnum::GYRO_FS_NOT_SET;
 			accelConfigEnum accelFullScale = accelConfigEnum::AFS_NOT_SET;
 
-			float offsetGyroPitch;
-			float offsetGyroRoll;
-			float offsetGyroYaw;
-			float offsetAccelX;
-			float offsetAccelY;
-			float offsetAccelZ;
+			float offsetGyroPitch{ 0.0f };
+			float offsetGyroRoll{ 0.0f };
+			float offsetGyroYaw{ 0.0f };
+			float offsetAccelX{ 0.0f };
+			float offsetAccelY{ 0.0f };
+			float offsetAccelZ{ 0.0f };
 
 			// IMU data masks
 			int gyroConfigMask; // See register 27 on p14/46 of register map document
