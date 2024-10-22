@@ -64,7 +64,7 @@ namespace Quad
 		private:
 			void calibrateIMU();
 
-			short read_raw_data(int addr);
+			float read_raw_data(int addr);
 
 			void setIMU_MaxRates(const gyroConfigEnum& gyroCfg, const accelConfigEnum& accelCfg);
 

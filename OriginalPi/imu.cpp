@@ -136,15 +136,23 @@ namespace Quad
 
 			for (uint16_t counter = 0; counter < calCycles; counter++)
 			{
-				readIMU_Data(currentGyroPitch, currentGyroRoll, currentGyroYaw,
-					currentAccelX, currentAccelY, currentAccelZ);
 
-				accumulatedGyroPitch += currentGyroPitch;
+				currentGyroPitch = read_raw_data(GYRO_XOUT_H) / gyroLSB_Value;
+				accumulatedGyroPitch = accumulatedGyroPitch + currentGyroPitch;
+
+				currentGyroRoll = read_raw_data(GYRO_YOUT_H) / gyroLSB_Value;
 				accumulatedGyroRoll += currentGyroRoll;
+
+				currentGyroYaw = read_raw_data(GYRO_ZOUT_H) / gyroLSB_Value;
 				accumulatedGyroYaw += currentGyroYaw;
 
+				currentAccelX = read_raw_data(ACCEL_XOUT_H) / accelLSB_Value;
 				accumulatedAccelX += currentAccelX;
+
+				currentAccelY = read_raw_data(ACCEL_YOUT_H) / accelLSB_Value;
 				accumulatedAccelY += currentAccelY;
+
+				currentAccelZ = read_raw_data(ACCEL_ZOUT_H) / accelLSB_Value;
 				accumulatedAccelZ = accumulatedAccelZ + (1.0 - currentAccelZ);
 
 				usleep(4000);
@@ -176,57 +184,18 @@ namespace Quad
 			float Gyro_y = read_raw_data(GYRO_YOUT_H);
 			float Gyro_z = read_raw_data(GYRO_ZOUT_H);
 
-			/* Divide raw value by sensitivity scale factor */
-			accelX = Acc_x / accelLSB_Value;
-			accelY = Acc_y / accelLSB_Value;
-			accelZ = Acc_z / accelLSB_Value;
+			/* Divide raw value by sensitivity scale factor, and subtract offset */
+			accelX = (Acc_x / accelLSB_Value) - offsetAccelX;
+			accelY = (Acc_y / accelLSB_Value) - offsetAccelY;
+			accelZ = (Acc_z / accelLSB_Value) - offsetAccelZ;
 
-			gyroPitch = Gyro_x / gyroLSB_Value;
-			gyroRoll = Gyro_y / gyroLSB_Value;
-			gyroYaw = Gyro_z / gyroLSB_Value;
+			gyroPitch = (Gyro_x / gyroLSB_Value) - offsetGyroPitch;
+			gyroRoll = (Gyro_y / gyroLSB_Value) - offsetGyroRoll;
+			gyroYaw = (Gyro_z / gyroLSB_Value) - offsetGyroYaw;
 
-			//// Code to read gyroscope and accelerometer data via I2C
-			//short gyroPitchH = wiringPiI2CReadReg8(imuHandle, GYRO_XOUT_H_REGISTER_ADDRESS);
-			//short gyroPitchL = wiringPiI2CReadReg8(imuHandle, GYRO_XOUT_L_REGISTER_ADDRESS);
-			//int gyroPitchHL = gyroPitchH << 8 | gyroPitchL;
-			//gyroPitch = gyroPitchHL / GYRO_LSB_VALUE;
-			////gyroPitch = gyroPitch - offsetGyroPitch;
-
-			//short gyroRollH = wiringPiI2CReadReg8(imuHandle, GYRO_YOUT_H_REGISTER_ADDRESS);
-			//short gyroRollL = wiringPiI2CReadReg8(imuHandle, GYRO_YOUT_L_REGISTER_ADDRESS);
-			//int gyroRollHL = gyroRollH << 8 | gyroRollL;
-			//gyroRoll = gyroRollHL / GYRO_LSB_VALUE;
-			////gyroRoll = gyroRoll - offsetGyroRoll;
-
-			//short gyroYawH = wiringPiI2CReadReg8(imuHandle, GYRO_ZOUT_H_REGISTER_ADDRESS);
-			//short gyroYawL = wiringPiI2CReadReg8(imuHandle, GYRO_ZOUT_L_REGISTER_ADDRESS);
-			//int gyroYawHL = gyroYawH << 8 | gyroYawL;
-			//gyroYaw = gyroYawHL / GYRO_LSB_VALUE;
-			////gyroYaw = gyroYaw - offsetGyroYaw;
-
-			//short accelX_H = wiringPiI2CReadReg8(imuHandle, ACCEL_XOUT_H_REGISTER_ADDRESS);
-			//short accelX_L = wiringPiI2CReadReg8(imuHandle, ACCEL_XOUT_L_REGISTER_ADDRESS);
-			//int accelX_HL = accelX_H << 8 | accelX_L;
-			//accelX = accelX_HL / ACCEL_LSB_VALUE;
-			////accelX = accelX - offsetAccelX;
-
-			//short accelY_H = wiringPiI2CReadReg8(imuHandle, ACCEL_YOUT_H_REGISTER_ADDRESS);
-			//short accelY_L = wiringPiI2CReadReg8(imuHandle, ACCEL_YOUT_L_REGISTER_ADDRESS);
-			//int accelY_HL = accelY_H << 8 | accelY_L;
-			//accelY = accelY_HL / ACCEL_LSB_VALUE;
-			////accelY = accelY - offsetAccelY;
-
-			//short accelZ_H = wiringPiI2CReadReg8(imuHandle, ACCEL_ZOUT_H_REGISTER_ADDRESS);
-			//short accelZ_L = wiringPiI2CReadReg8(imuHandle, ACCEL_ZOUT_L_REGISTER_ADDRESS);
-			//int accelZ_HL = accelZ_H << 8 | accelZ_L;
-			//accelZ = accelZ_HL / ACCEL_LSB_VALUE;
-			////accelZ = accelZ - offsetAccelZ;
-
-			//std::cout << "Pitch: " << gyroPitch << " Roll: " << gyroRoll << " Yaw: " << gyroYaw
-			//	<< " Accel X: " << accelX << " Accel Y: " << accelY << " Accel Z: " << accelZ << std::endl;
 		}
 
-		short intertialMeasurementUnit::read_raw_data(int addr) {
+		float intertialMeasurementUnit::read_raw_data(int addr) {
 			short high_byte, low_byte, value;
 			high_byte = wiringPiI2CReadReg8(imuHandle, addr);
 			low_byte = wiringPiI2CReadReg8(imuHandle, addr + 1);
