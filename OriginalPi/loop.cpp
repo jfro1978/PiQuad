@@ -10,15 +10,18 @@ namespace Quad
 	namespace Loop
 	{
 		Loop::Loop() :
-			mRawIMU_GyroPitchData(0),
-			mRawIMU_GyroRollData(0),
-			mRawIMU_GyroYawData(0),
-			mRawIMU_AccelX_Data(0),
-			mRawIMU_AccelY_Data(0),
-			mRawIMU_AccelZ_Data(0),
-			mAccelX(0),
-			mAccelY(0),
-			mAccelZ(0),
+			mRawIMU_GyroPitchData(0.0f),
+			mRawIMU_GyroRollData(0.0f),
+			mRawIMU_GyroYawData(0.0f),
+			mRawIMU_AccelX_Data(0.0f),
+			mRawIMU_AccelY_Data(0.0f),
+			mRawIMU_AccelZ_Data(0.0f),
+			mGyroPitch(0.0f),
+			mGyroRoll(0.0f),
+			mGyroYaw(0.0f),
+			mAccelX(0.0f),
+			mAccelY(0.0f),
+			mAccelZ(0.0f),
 			mQuadState(quadStateEnum::STANDBY),
 			mReceiverChannel1(1500), // Hardcoded while developing altitude control algorithm
 			mReceiverChannel2(1500), // Hardcoded while developing altitude control algorithm
@@ -117,47 +120,17 @@ namespace Quad
 					//pid.determineSetpoints(mReceiverChannel1, mReceiverChannel2, mReceiverChannel3, mReceiverChannel4);
 
 					// Read gyro values
-					/*mpu6050.readIMU_Data(mRawIMU_GyroPitchData, mRawIMU_GyroRollData, mRawIMU_GyroYawData,
-						mRawIMU_AccelX_Data, mRawIMU_AccelY_Data, mRawIMU_AccelZ_Data);*/
+					mpu6050.readIMU_Data(mRawIMU_GyroPitchData, mRawIMU_GyroRollData, mRawIMU_GyroYawData,
+						mRawIMU_AccelX_Data, mRawIMU_AccelY_Data, mRawIMU_AccelZ_Data);
 
-				float Gx, Gy, Gz, Ax, Ay, Az = 0.0f;
-
-				mpu6050.readIMU_Data(Gx, Gy, Gz, Ax, Ay, Az);
-
-				printf("\n Gx=%.3f deg/s\tGy=%.3f deg/s\tGz=%.3f deg/s\tAx=%.3f g\tAy=%.3f g\tAz=%.3f g\n", Gx, Gy, Gz, Ax, Ay, Az);
-
-						/*Read raw value of Accelerometer and gyroscope from MPU6050*/
-				//float Acc_x = read_raw_data(ACCEL_XOUT_H);
-				//float Acc_y = read_raw_data(ACCEL_YOUT_H);
-				//float Acc_z = read_raw_data(ACCEL_ZOUT_H);
-
-				//float Gyro_x = read_raw_data(GYRO_XOUT_H);
-				//float Gyro_y = read_raw_data(GYRO_YOUT_H);
-				//float Gyro_z = read_raw_data(GYRO_ZOUT_H);
-
-				///* Divide raw value by sensitivity scale factor */
-				//float Ax = Acc_x / 16384.0;
-				//float Ay = Acc_y / 16384.0;
-				//float Az = Acc_z / 16384.0;
-
-				//float Gx = Gyro_x / 131;
-				//float Gy = Gyro_y / 131;
-				//float Gz = Gyro_z / 131;
-
-				//printf("\n Gx=%.3f deg/s\tGy=%.3f deg/s\tGz=%.3f deg/s\tAx=%.3f g\tAy=%.3f g\tAz=%.3f g\n", Gx, Gy, Gz, Ax, Ay, Az);
-				//delay(500);
-
-					// Filter the IMU data to limit the effect of spikes in the received IMU data
-					/*mGyroPitch = (mGyroPitch * IMU_DATA_FILTER) + (mRawIMU_GyroPitchData * IMU_DATA_FILTER);
+					// Filter the IMU data to limit the effect of spikes in current readings
+					mGyroPitch = (mGyroPitch * IMU_DATA_FILTER) + (mRawIMU_GyroPitchData * IMU_DATA_FILTER);
 					mGyroRoll = (mGyroRoll * IMU_DATA_FILTER) + (mRawIMU_GyroRollData * IMU_DATA_FILTER);
 					mGyroYaw = (mGyroYaw * IMU_DATA_FILTER) + (mRawIMU_GyroYawData * IMU_DATA_FILTER);
 
 					mAccelX = (mAccelX * IMU_DATA_FILTER) + (mRawIMU_AccelX_Data * IMU_DATA_FILTER);
 					mAccelY = (mAccelY * IMU_DATA_FILTER) + (mRawIMU_AccelY_Data * IMU_DATA_FILTER);
-					mAccelZ = (mAccelZ * IMU_DATA_FILTER) + (mRawIMU_AccelZ_Data * IMU_DATA_FILTER);*/
-
-		/*			std::cout << "Pitch: " << mRawIMU_GyroPitchData << ", Roll: " << mRawIMU_GyroRollData << ", Yaw: " << mRawIMU_GyroYawData <<
-						", Accel X: " << mRawIMU_AccelX_Data << ", Accel Y: " << mRawIMU_AccelY_Data << ", Accel Z: " << mRawIMU_AccelZ_Data << std::endl;*/
+					mAccelZ = (mAccelZ * IMU_DATA_FILTER) + (mRawIMU_AccelZ_Data * IMU_DATA_FILTER);
 
 					//pid.determineAxisPID_Outputs(mGyroPitch, mGyroRoll, mGyroYaw, mAccelZ);
 

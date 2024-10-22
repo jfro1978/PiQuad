@@ -59,13 +59,13 @@ namespace Quad
 			float mRawIMU_AccelY_Data;
 			float mRawIMU_AccelZ_Data;
 
-			short mGyroPitch;
-			short mGyroRoll;
-			short mGyroYaw;
+			float mGyroPitch;
+			float mGyroRoll;
+			float mGyroYaw;
 
-			short mAccelX;
-			short mAccelY;
-			short mAccelZ;
+			float mAccelX;
+			float mAccelY;
+			float mAccelZ;
 
 			quadStateEnum mQuadState;
 
